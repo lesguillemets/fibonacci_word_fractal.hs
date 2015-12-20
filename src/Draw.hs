@@ -17,6 +17,8 @@ backColour :: Color
 backColour = black
 basicLength :: Double
 basicLength = 5
+basicAngle :: Double
+basicAngle = pi/2
 
 window :: String -> Display
 window s = InWindow s (500,500) (30,30)
@@ -39,7 +41,7 @@ follow turns = Pictures $ f initTurtle turns
         f _ [] = []
         f !(t@Turtle{..}) (d:ds) =
             let newLoc = _loc +: forward t basicLength
-                newAngle = _dir + (pi/2) * fromIntegral d
+                newAngle = _dir + basicAngle * fromIntegral d
                 currentEdge = path _loc newLoc
                 in
                 currentEdge : f (Turtle newLoc newAngle) ds
