@@ -17,8 +17,11 @@ cabal-version:       >=1.10
 
 executable fibonacci-word-fractal
   main-is:             Main.hs
-  -- other-modules:       
+  other-modules:       Fibonacci
+                     , Draw
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9
+                     , vector
+                     , gloss
   hs-source-dirs:      src
   default-language:    Haskell2010
