@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -O3 -threaded #-}
 import Fibonacci
 import Draw
 
