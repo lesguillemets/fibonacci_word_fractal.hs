@@ -2,7 +2,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE BangPatterns #-}
 module Draw (drawFib, drawFibWithColour,
-             drawFibDefault, drawFibRainbow) where
+             drawFibDefault, drawFibRainbow, drawFibMonochrome) where
 
 import qualified Data.Vector.Unboxed as V
 import Control.Arrow
@@ -48,6 +48,9 @@ drawFibRainbow ang ds = drawFib ang f ds
     where
         l = fromIntegral $ V.length ds
         f i = fromHSV (fromIntegral i*360/l, 1,1)
+
+drawFibMonochrome :: Angle -> V.Vector Bool -> IO ()
+drawFibMonochrome = flip drawFib (const lineColour)
 
 toPict :: Angle          -- angle to turn
        -> (Int -> Color) -- Index to Colour
