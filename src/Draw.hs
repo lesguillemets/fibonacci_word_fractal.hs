@@ -29,25 +29,26 @@ toTurn (locEven,b) = if b
                          else 0
 
 drawFib :: V.Vector Bool -> IO ()
-drawFib = display (window "fib!") backColour . toPict
+drawFib = display (window "fib!") backColour . toPict (const lineColour)
 
-toPict :: V.Vector Bool -> Picture
-toPict = follow . map toTurn . zip (cycle [True,False]) . V.toList
+toPict :: (Int -> Color) -- Index to Colour
+        -> V.Vector Bool -> Picture
+toPict f = follow f . map toTurn . zip (cycle [True,False]) . V.toList
     
-follow :: [Int] -> Picture
-follow turns = Pictures $ f initTurtle turns
+follow :: (Int -> Color) -> [Int] -> Picture
+follow colourFun turns = Pictures $ f initTurtle (zip [0..] turns)
     where
-        f :: Turtle -> [Int] -> [Picture]
+        f :: Turtle -> [(Int,Int)] -> [Picture]
         f _ [] = []
-        f !(t@Turtle{..}) (d:ds) =
+        f !(t@Turtle{..}) ((colN,d):xs) =
             let newLoc = _loc +: forward t basicLength
                 newAngle = _dir + basicAngle * fromIntegral d
-                currentEdge = path _loc newLoc
+                currentEdge = path (colourFun colN) _loc newLoc
                 in
-                currentEdge : f (Turtle newLoc newAngle) ds
+                currentEdge : f (Turtle newLoc newAngle) xs
 
-path :: (Double, Double) -> (Double, Double) -> Picture
-path p0 p1 = color lineColour . line . map floatise $ [p0, p1]
+path :: Color -> (Double, Double) -> (Double, Double) -> Picture
+path col p0 p1 = color col . line . map floatise $ [p0, p1]
 
 data Turtle = Turtle {_loc :: (Double, Double), _dir :: Double}
 initTurtle :: Turtle
