@@ -1,7 +1,8 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE BangPatterns #-}
-module Draw (drawFib, drawFibRainbow) where
+module Draw (drawFib, drawFibWithColour,
+             drawFibDefault, drawFibRainbow) where
 
 import qualified Data.Vector.Unboxed as V
 import Control.Arrow
@@ -18,7 +19,8 @@ backColour :: Color
 backColour = black
 basicLength :: Double
 basicLength = 5
-basicAngle :: Double
+type Angle = Double
+basicAngle :: Angle
 basicAngle = pi/2
 
 window :: String -> Display
@@ -29,30 +31,40 @@ toTurn (locEven,b) = if b
                          then (if locEven then 1 else (-1 ))
                          else 0
 
+drawFib :: Angle           -- angle to turn
+        -> (Int -> Color)  -- function to determine colour based on Index
+        -> V.Vector Bool   -- fibonacci string
+        -> IO ()           -- draw
+drawFib ang f = display (window "fib!") backColour . toPict ang f
+
 drawFibWithColour :: (Int -> Color) -> V.Vector Bool -> IO ()
-drawFibWithColour f = display (window "fib!") backColour . toPict f
+drawFibWithColour = drawFib basicAngle
 
-drawFib :: V.Vector Bool -> IO ()
-drawFib = drawFibWithColour (const lineColour)
+drawFibDefault :: V.Vector Bool -> IO ()
+drawFibDefault = drawFibWithColour (const lineColour)
 
-drawFibRainbow :: V.Vector Bool -> IO ()
-drawFibRainbow ds = drawFibWithColour f ds
+drawFibRainbow :: Angle -> V.Vector Bool -> IO ()
+drawFibRainbow ang ds = drawFib ang f ds
     where
         l = fromIntegral $ V.length ds
         f i = fromHSV (fromIntegral i*360/l, 1,1)
 
-toPict :: (Int -> Color) -- Index to Colour
-        -> V.Vector Bool -> Picture
-toPict f = follow f . map toTurn . zip (cycle [True,False]) . V.toList
+toPict :: Angle          -- angle to turn
+       -> (Int -> Color) -- Index to Colour
+       -> V.Vector Bool -> Picture
+toPict ang f = follow ang f . map toTurn . zip (cycle [True,False]) . V.toList
     
-follow :: (Int -> Color) -> [Int] -> Picture
-follow colourFun turns = Pictures $ f initTurtle (zip [0..] turns)
+follow :: Angle
+       -> (Int -> Color)
+       -> [Int]
+       -> Picture
+follow ang colourFun turns = Pictures $ f initTurtle (zip [0..] turns)
     where
         f :: Turtle -> [(Int,Int)] -> [Picture]
         f _ [] = []
         f !(t@Turtle{..}) ((colN,d):xs) =
             let newLoc = _loc +: forward t basicLength
-                newAngle = _dir + basicAngle * fromIntegral d
+                newAngle = _dir + ang * fromIntegral d
                 currentEdge = path (colourFun colN) _loc newLoc
                 in
                 currentEdge : f (Turtle newLoc newAngle) xs

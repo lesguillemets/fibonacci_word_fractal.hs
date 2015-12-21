@@ -7,6 +7,6 @@ import Text.Read (readMaybe)
 
 main = do
     l <- getArgs
-    drawFibRainbow . fibWord $ case map readMaybe l of
+    drawFibRainbow (3*pi/7) . fibWord $ case map readMaybe l of
                              (Just d:_) -> d
                              _ -> 16
