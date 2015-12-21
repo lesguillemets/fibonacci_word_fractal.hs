@@ -1,7 +1,7 @@
 {-# LANGUAGE DisambiguateRecordFields #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE BangPatterns #-}
-module Draw (drawFib) where
+module Draw (drawFib, drawFibRainbow) where
 
 import qualified Data.Vector.Unboxed as V
 import Control.Arrow
@@ -10,6 +10,7 @@ import Graphics.Gloss
 import Data.List
 
 import Fibonacci
+import Colour
 
 lineColour :: Color
 lineColour = white
@@ -28,8 +29,17 @@ toTurn (locEven,b) = if b
                          then (if locEven then 1 else (-1 ))
                          else 0
 
+drawFibWithColour :: (Int -> Color) -> V.Vector Bool -> IO ()
+drawFibWithColour f = display (window "fib!") backColour . toPict f
+
 drawFib :: V.Vector Bool -> IO ()
-drawFib = display (window "fib!") backColour . toPict (const lineColour)
+drawFib = drawFibWithColour (const lineColour)
+
+drawFibRainbow :: V.Vector Bool -> IO ()
+drawFibRainbow ds = drawFibWithColour f ds
+    where
+        l = fromIntegral $ V.length ds
+        f i = fromHSV (fromIntegral i*360/l, 1,1)
 
 toPict :: (Int -> Color) -- Index to Colour
         -> V.Vector Bool -> Picture

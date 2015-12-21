@@ -19,6 +19,7 @@ executable fibonacci-word-fractal
   main-is:             Main.hs
   other-modules:       Fibonacci
                      , Draw
+                     , Colour
   -- other-extensions:    
   build-depends:       base >=4.8 && <4.9
                      , vector
