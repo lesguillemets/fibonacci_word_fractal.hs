@@ -3,7 +3,9 @@ module Fibonacci (fibWord) where
 import qualified Data.Vector.Unboxed as V
 
 fibWord :: Int -> V.Vector Bool
-fibWord n = fibWord' n (V.fromList [False]) (V.fromList [False,True])
+fibWord n
+    | n < 0 = error "Nice try: Can't accept negative numbers"
+    | otherwise  = fibWord' n (V.fromList [False]) (V.fromList [False,True])
     where
         fibWord' :: Int ->  V.Vector Bool -> V.Vector Bool -> V.Vector Bool
         fibWord' 0 v0 _ = v0
